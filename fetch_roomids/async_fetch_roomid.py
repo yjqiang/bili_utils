@@ -1,3 +1,9 @@
+'''
+init_min 寻找当前文件夹内文件，用来初始化min，用于中断后的重启
+save_all 确定规模50w一个文件
+save_one 50w分批次运行，400一个批次，全部运行50w后，保存toml
+输出文件为[(roomid, uid), (roomid, uid) ...]
+'''
 import asyncio
 import aiohttp
 import sys

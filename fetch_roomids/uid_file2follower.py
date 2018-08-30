@@ -1,3 +1,8 @@
+'''
+save_all 查找readable开头的toml文件
+save_one 对每个readable文件分批次运行，400一个批次，全部运行后，保存toml
+输出文件为[(roomid, follower_num), (roomid, follower_num) ...], 过滤了粉丝少于1000的主播
+'''
 import asyncio
 import aiohttp
 import sys
@@ -101,8 +106,6 @@ async def save_one(file_url, chuncks_roomid):
  
                         
 async def save_all():
-    # del_bracket()
-    
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
     file_urls = []
     for f in files:
