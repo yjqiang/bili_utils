@@ -94,7 +94,7 @@ async def save_one(file_url, chuncks_roomid):
             results = await asyncio.gather(*tasklist)
             for real_roomid, follow_num in results:
                 if follow_num > 1000:
-                    list_rooms.append((real_roomid, uid))
+                    list_rooms.append((real_roomid, follow_num))
         print(f'当前一共{len(list_rooms)}个房间({file_url}第{i}批次)')
 
     await webhub.var_session.close()
