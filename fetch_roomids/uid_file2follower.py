@@ -55,14 +55,18 @@ class WebHub:
                 continue
     
     async def fetch_follow_num(self, real_roomid, uid):
-        url = f'https://api.live.bilibili.com/relation/v1/Feed/GetUserFc?follow={uid}'
-        json_rsp = await self.session_get(url)
-        if not json_rsp['code'] and 'fc' in json_rsp['data']:
-            # int
-            return real_roomid, json_rsp['data']['fc']
-        else:
-            print(f'{uid}的用户获取过程中发生错误，{json_rsp}')
-            sys.exit(-1)
+        while True:
+            url = f'https://api.live.bilibili.com/relation/v1/Feed/GetUserFc?follow={uid}'
+            json_rsp = await self.session_get(url)
+            if not json_rsp['code'] and 'fc' in json_rsp['data']:
+                # int
+                return real_roomid, json_rsp['data']['fc']
+            elif json_rsp['code'] == -1:
+                print(f'{uid}的用户获取过程中发生错误，{json_rsp}, 稍后重试，如果一直刷请反馈')
+            else:
+                print(f'{uid}的用户获取过程中发生错误，{json_rsp}, 请反馈')
+                sys.exit(-1)
+            await asyncio.sleep(1)
     
     async def fetch_room_info(self, roomid):
         url = f'https://api.live.bilibili.com/room/v1/Room/room_init?id={roomid}'
