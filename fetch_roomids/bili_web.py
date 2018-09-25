@@ -78,13 +78,13 @@ class WebHub:
             print(f'{roomid}的房间获取过程中发生错误，{json_rsp}')
             sys.exit(-1)
             
-    async def fetch_fan_gifts(self, roomid):
+    async def fetch_fan_gifts(self, roomid, uid):
         url = f'https://api.live.bilibili.com/AppRoom/getGiftTop?room_id={roomid}'
         json_rsp = await self.session_get(url)
         # print(len(json_rsp['data']['list']), roomid)
         if not json_rsp['code']:
             # int, int
-            return len(json_rsp['data']['list']), roomid
+            return len(json_rsp['data']['list']), roomid, uid
         else:
             print(f'{roomid}的房间获取过程中发生错误，{json_rsp}')
             sys.exit(-1)

@@ -1,7 +1,7 @@
 '''
 init_min 寻找当前文件夹内文件，用来初始化min，用于中断后的重启
 save_all 确定规模50w一个文件
-save_one 50w分批次运行，400一个批次，全部运行50w后，保存toml
+save_one 50w分批次运行，400一个批次，全部运行50w后(过滤短号；过滤不开播的直播间，根据排行榜过滤)，保存toml
 输出文件为[(roomid, uid), (roomid, uid) ...]
 '''
 import asyncio
@@ -20,16 +20,24 @@ async def save_one(room_min, room_max):
     step = 400
     for i in range(room_min, room_max, step):
         await asyncio.sleep(0.1)
-        tasklist = []
+        tasklist0 = []
+        list_roomid_uid = []
         for roomid in range(i, i + step):
             task = asyncio.ensure_future(webhub.fetch_room_info(roomid))
-            tasklist.append(task)
-        if tasklist:
-            results = await asyncio.gather(*tasklist)
-            for real_roomid, uid in results:
-                if real_roomid is not None:
-                    print(real_roomid)
-                    list_rooms.append((real_roomid, uid))
+            tasklist0.append(task)
+        if tasklist0:
+            results = await asyncio.gather(*tasklist0)
+            list_roomid_uid = [(real_roomid, uid) for real_roomid, uid in results if real_roomid is not None]
+        # print(real_roomid)
+        tasklist1 = []
+        for roomid, uid in list_roomid_uid:
+            task = asyncio.ensure_future(webhub.fetch_fan_gifts(roomid, uid))
+            tasklist1.append(task)
+        if tasklist1:
+            results = await asyncio.gather(*tasklist1)
+            for num, roomid, uid in results:
+                if num >= 9:
+                    list_rooms.append((roomid, uid))
         print(f'当前一共{len(list_rooms)}个房间({room_min}-{i+step-1})')
 
     await webhub.var_session.close()
