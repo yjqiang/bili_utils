@@ -12,7 +12,7 @@ class WebHub:
     @property
     def session(self):
         if self.var_session is None:
-            self.var_session = aiohttp.ClientSession()
+            self.var_session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2))
         return self.var_session
     
     async def get_json_rsp(self, rsp, url):
