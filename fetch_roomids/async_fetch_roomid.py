@@ -68,8 +68,13 @@ class WebHub:
         url = f'https://api.live.bilibili.com/room/v1/Room/room_init?id={roomid}'
         json_rsp = await self.session_get(url)
         if not json_rsp['code']:
+            data = json_rsp['data']
+            short_id = data["short_id"]
+            if short_id and short_id == roomid:
+                # print(data)
+                return None, None
             # int, int
-            return json_rsp['data']['room_id'], json_rsp['data']['uid']
+            return data['room_id'], data['uid']
         elif json_rsp['code'] == 60004:
             return None, None
         else:
