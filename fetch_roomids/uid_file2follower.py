@@ -2,6 +2,7 @@
 save_all 查找readable开头的toml文件
 save_one 对每个readable文件分批次运行，400一个批次，全部运行后，保存toml
 输出文件为[(roomid, follower_num), (roomid, follower_num) ...], 过滤了粉丝少于1000的主播
+v0.9.6+ toml会输出为[[roomid, follower_num], [roomid, follower_num] ...]
 '''
 import asyncio
 import sys
@@ -42,13 +43,14 @@ async def save_all():
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
     file_urls = []
     for f in files:
-        if ').toml' in f and f[:9] == 'readable_':
+        if f[-6:] == ').toml' in f and f[:9] == 'readable_':
             print(f'找到文件{f}')
             file_urls.append(f)
     for file_url in file_urls:
         with open(file_url, encoding="utf-8") as f:
             dic_roomid = toml.load(f)
         roomids = dic_roomid['roomid']
+        '''
         num_roomid = len(roomids) / 2
         print('检查string去括号数据', file_url, num_roomid)
         num_roomid = int(num_roomid)
@@ -57,6 +59,8 @@ async def save_all():
             roomid = roomids[2 * i]
             uid = roomids[2 * i + 1]
             list_tuple_roomid_uid.append((roomid, uid))
+        '''
+        list_tuple_roomid_uid = roomids
         len_list_tuple_roomid_uid = len(list_tuple_roomid_uid)
         print('检查tuple数据', file_url, len_list_tuple_roomid_uid)
         chuncks = [list_tuple_roomid_uid[x: x+400] for x in range(0, len_list_tuple_roomid_uid, 400)]

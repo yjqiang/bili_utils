@@ -7,7 +7,7 @@ def sort_all():
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
     file_urls = []
     for f in files:
-        if '.toml' in f and f[:17] == 'readable_follower':
+        if f[-5:] == '.toml' and f[:17] == 'readable_follower':
             print(f'找到文件{f}')
             file_urls.append(f)
     list_roomid_follower = []
@@ -15,6 +15,7 @@ def sort_all():
         with open(file_url, encoding="utf-8") as f:
             dic_roomid = toml.load(f)
         roomids = dic_roomid['roomid']
+        '''
         num_roomid = len(roomids) / 2
         print('检查string去括号数据', file_url, num_roomid)
         num_roomid = int(num_roomid)
@@ -22,6 +23,8 @@ def sort_all():
             roomid = roomids[2 * i]
             follower_num = roomids[2 * i + 1]
             list_roomid_follower.append((roomid, follower_num))
+        '''
+        list_roomid_follower = list_roomid_follower + roomids
     
     print(len(list_roomid_follower))
     list_roomid_follower.sort(key=itemgetter(1), reverse=True)

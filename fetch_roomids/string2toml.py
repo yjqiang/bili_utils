@@ -8,7 +8,7 @@ def del_bracket():
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
     file_urls = []
     for f in files:
-        if '.toml' in f and f[:9] != 'readable_':
+        if f[-5:] == '.toml' in f and f[:9] != 'readable_':
             print(f'找到文件{f}')
             file_urls.append(f)
     for i in file_urls:

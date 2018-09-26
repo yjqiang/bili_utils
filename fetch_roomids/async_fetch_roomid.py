@@ -3,6 +3,7 @@ init_min 寻找当前文件夹内文件，用来初始化min，用于中断后�
 save_all 确定规模50w一个文件
 save_one 50w分批次运行，400一个批次，全部运行50w后(过滤短号；过滤不开播的直播间，根据排行榜过滤)，保存toml
 输出文件为[(roomid, uid), (roomid, uid) ...]
+v0.9.6+ toml会输出为[[roomid, uid], [roomid, uid] ...]
 '''
 import asyncio
 import sys
@@ -43,8 +44,6 @@ async def save_one(room_min, room_max):
     await webhub.var_session.close()
 
     print(f'一共{len(list_rooms)}个房间')
-    list_rooms = list(set(list_rooms))
-    print(f'一共{len(list_rooms)}个房间')
     
     dict_title = {'roomid': list_rooms}
 
@@ -56,7 +55,7 @@ def init_min(min_room, max_room, step):
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
     finished_range_mins = []
     for f in files:
-        if ').toml' in f:
+        if f[-6:] == ').toml':
             print(f'找到文件{f}')
             finished_range_mins.append(int(f.split('-')[0]))
     for i in range(min_room, max_room, step):
