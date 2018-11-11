@@ -1,5 +1,4 @@
 import asyncio
-import time
 import toml
 from itertools import zip_longest
 from datetime import datetime
@@ -14,10 +13,17 @@ class WebServer():
         self.static_rooms = dic_roomid['roomid']
         self.dyn_rooms = self.static_rooms
         self.net = BiliNet()
+        self.latest_refresh = '0 to 0'
+        self.latest_refresh_dyn_num = []
         print('static rooms', len(self.static_rooms))
         
     async def intro(self, request):
-        data = {'code': 0, 'version': '1.0.0'}
+        data = {
+            'code': 0,
+            'version': '1.1.0',
+            'latest_refresh': self.latest_refresh,
+            'latest_refresh_dyn_num': self.latest_refresh_dyn_num
+            }
         return web.json_response(data)
     
     async def hello(self, request):
@@ -58,6 +64,7 @@ class WebServer():
         return web.json_response(data)
         
     async def refresh(self):
+        latest_refresh_start = timestamp()
         async def fetch_room(url):
             rooms = []
             for page in range(1, 250):
@@ -69,8 +76,8 @@ class WebServer():
                 online_num = [room['online'] for room in data]
                 if not data or max(online_num) <= 150:
                     print(f'截止第{page}页，获取了{len(rooms)}个房间(可能重复)')
-                    if page <= 25:
-                        print(json_rsp)
+                    # if page <= 25:
+                    #     print(json_rsp)
                     break
                 for room in data:
                     if room['online'] >= 100:
@@ -103,7 +110,8 @@ class WebServer():
                 if room is not None and room not in unique_rooms:
                     unique_rooms.append(room)
         print(f'动态方法总获取房间{len(unique_rooms)}')
-        
+        self.latest_refresh_dyn_num = [len(rooms) for rooms in roomlists]
+        self.latest_refresh_dyn_num.append(len(unique_rooms))
         roomid_conf = self.static_rooms
         for i in roomid_conf:
             if len(unique_rooms) >= 6000:
@@ -113,11 +121,12 @@ class WebServer():
         print(f'合计总获取房间{len(unique_rooms)}')
         self.dyn_rooms = unique_rooms
         print(self.dyn_rooms[:10])
+        self.latest_refresh = f'{latest_refresh_start} to {timestamp()}'
     
 
 def timestamp():
-    str_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    return str_time
+    time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return time_now
             
 async def init(loop):
     app = web.Application(loop=loop)
@@ -132,6 +141,7 @@ async def init(loop):
     app.router.add_get('/dyn_rooms/{start}-{end}', webserver.fetch_rooms)
     await loop.create_server(app.make_handler(), '0.0.0.0', 8000)
     print('Server started at port 8000...')
+    await webserver.refresh()
     while True:
         now = datetime.now()
         print(f'{timestamp()}')
