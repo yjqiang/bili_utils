@@ -20,7 +20,7 @@ class WebServer():
     async def intro(self, request):
         data = {
             'code': 0,
-            'version': '1.1.0',
+            'version': '1.1.1',
             'latest_refresh': self.latest_refresh,
             'latest_refresh_dyn_num': self.latest_refresh_dyn_num
             }
@@ -145,7 +145,7 @@ async def init(loop):
     while True:
         now = datetime.now()
         print(f'{timestamp()}')
-        if (now.minute == 30 or now.minute == 0) and now.second <= 40:
+        if (now.minute == 0 or now.minute == 20 or now.minute == 40) and now.second <= 40:
             print('到达设定时间，正在重新查看房间')
             print(f'{timestamp()}')
             await webserver.refresh()
