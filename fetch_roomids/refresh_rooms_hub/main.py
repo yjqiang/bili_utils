@@ -20,7 +20,7 @@ class WebServer():
     async def intro(self, request):
         data = {
             'code': 0,
-            'version': '1.1.1',
+            'version': '1.1.2',
             'latest_refresh': self.latest_refresh,
             'latest_refresh_dyn_num': self.latest_refresh_dyn_num
             }
@@ -74,14 +74,14 @@ class WebServer():
                 json_rsp = await self.net.get_roomids(url, page)
                 data = json_rsp['data']
                 online_num = [room['online'] for room in data]
-                if not data or max(online_num) <= 150:
+                if not data or max(online_num) <= 100:
                     print(f'截止第{page}页，获取了{len(rooms)}个房间(可能重复)')
                     # if page <= 25:
                     #     print(json_rsp)
                     break
                 for room in data:
-                    if room['online'] >= 100:
-                        rooms.append(room['roomid'])
+                    # room['online']
+                    rooms.append(room['roomid'])
                 await asyncio.sleep(0.15)
                                     
             print('去重之前', len(rooms))
@@ -101,7 +101,7 @@ class WebServer():
         ]
         roomlists = [await fetch_room(urls[0])]
         for url in urls[1:]:
-            await asyncio.sleep(10)
+            await asyncio.sleep(6)
             roomlists.append(await fetch_room(url))
 
         unique_rooms = []
@@ -150,6 +150,7 @@ async def init(loop):
             print(f'{timestamp()}')
             await webserver.refresh()
             print(f'{timestamp()}')
+            await asyncio.sleep(60)
         await asyncio.sleep(30)
         '''
         print(f'{timestamp()}')
