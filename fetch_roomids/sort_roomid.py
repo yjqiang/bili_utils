@@ -7,7 +7,7 @@ def sort_all():
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
     file_urls = []
     for f in files:
-        if f[-5:] == '.toml' and f[:17] == 'readable_follower':
+        if f[-5:] == '.toml' and f[:16] == 'roomid_followers':
             print(f'找到文件{f}')
             file_urls.append(f)
     list_roomid_follower = []

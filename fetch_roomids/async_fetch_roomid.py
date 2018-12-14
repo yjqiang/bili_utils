@@ -18,9 +18,9 @@ async def save_one(room_min, room_max):
     # room_min, room_max必须被400整除
     webhub = WebHub()
     list_rooms = []
-    step = 400
+    step = 10
     for i in range(room_min, room_max, step):
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.3)
         tasklist0 = []
         list_roomid_uid = []
         for roomid in range(i, i + step):
@@ -37,7 +37,7 @@ async def save_one(room_min, room_max):
         if tasklist1:
             results = await asyncio.gather(*tasklist1)
             for num, roomid, uid in results:
-                if num >= 9:
+                if num >= 8:
                     list_rooms.append((roomid, uid))
         print(f'当前一共{len(list_rooms)}个房间({room_min}-{i+step-1})')
 
@@ -47,7 +47,7 @@ async def save_one(room_min, room_max):
     
     dict_title = {'roomid': list_rooms}
 
-    with open(f'{room_min}-{room_max-1}({len(list_rooms)}).toml', 'w', encoding="utf-8") as f:
+    with open(f'roomid_uid{room_min}-{room_max-1}({len(list_rooms)}).toml', 'w', encoding="utf-8") as f:
         toml.dump(dict_title, f)
  
                
@@ -65,7 +65,7 @@ def init_min(min_room, max_room, step):
         
 async def save_all():
     min_room = 0
-    max_room = 14000000
+    max_room = 16000000
     step = 500000
     # 收录从min到(max_room-1),min max必须被500000整除
     min_room = init_min(min_room, max_room, step)

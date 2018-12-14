@@ -15,7 +15,7 @@ async def save_one(file_url, chuncks_roomid):
     webhub = WebHub()
     list_rooms = []
     for i, piece in enumerate(chuncks_roomid):
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.3)
         tasklist = []
         for roomid, uid in piece:
             task = asyncio.ensure_future(webhub.fetch_follow_num(roomid, uid))
@@ -23,7 +23,7 @@ async def save_one(file_url, chuncks_roomid):
         if tasklist:
             results = await asyncio.gather(*tasklist)
             for real_roomid, follow_num in results:
-                if follow_num > 1000:
+                if follow_num > 500:
                     list_rooms.append((real_roomid, follow_num))
         print(f'当前一共{len(list_rooms)}个房间({file_url}第{i}批次)')
 
@@ -35,7 +35,7 @@ async def save_one(file_url, chuncks_roomid):
     
     file_url = file_url.split('.')[0]
 
-    with open(f'follower_{file_url[9:]}_{len(list_rooms)}.toml', 'w', encoding="utf-8") as f:
+    with open(f'roomid_followers{file_url[10:]}_{len(list_rooms)}.toml', 'w', encoding="utf-8") as f:
         toml.dump(dict_title, f)
  
                         
@@ -43,7 +43,7 @@ async def save_all():
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
     file_urls = []
     for f in files:
-        if f[-6:] == ').toml' in f and f[:9] == 'readable_':
+        if f[-6:] == ').toml' in f and f[:10] == 'roomid_uid':
             print(f'找到文件{f}')
             file_urls.append(f)
     for file_url in file_urls:
@@ -63,7 +63,7 @@ async def save_all():
         list_tuple_roomid_uid = roomids
         len_list_tuple_roomid_uid = len(list_tuple_roomid_uid)
         print('检查tuple数据', file_url, len_list_tuple_roomid_uid)
-        chuncks = [list_tuple_roomid_uid[x: x+400] for x in range(0, len_list_tuple_roomid_uid, 400)]
+        chuncks = [list_tuple_roomid_uid[x: x+10] for x in range(0, len_list_tuple_roomid_uid, 10)]
         last_piece = chuncks[-1]
         print(f'一共{len_list_tuple_roomid_uid}数据,分片情况为{len(chuncks)}份，最后一份为{len(last_piece)}')
         print(f'数据校验位为{len_list_tuple_roomid_uid - (len(chuncks) - 1) * 400 - len(last_piece)}')
