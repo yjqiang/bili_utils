@@ -55,9 +55,9 @@ def init_min(min_room, max_room, step):
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
     finished_range_mins = []
     for f in files:
-        if f[-6:] == ').toml':
+        if f[-6:] == ').toml' and f[:10] == 'roomid_uid':
             print(f'找到文件{f}')
-            finished_range_mins.append(int(f.split('-')[0]))
+            finished_range_mins.append(int(f[10:].split('-')[0]))
     for i in range(min_room, max_room, step):
         if i not in finished_range_mins:
             print('初始化', i)
