@@ -20,7 +20,7 @@ class WebServer():
     async def intro(self, request):
         data = {
             'code': 0,
-            'version': '1.1.2',
+            'version': '1.1.3',
             'latest_refresh': self.latest_refresh,
             'latest_refresh_dyn_num': self.latest_refresh_dyn_num
             }
@@ -68,7 +68,7 @@ class WebServer():
         async def fetch_room(url):
             rooms = []
             for page in range(1, 250):
-                if not (page % 30):
+                if not (page % 20):
                     print(f'截止第{page}页，获取了{len(rooms)}个房间(可能重复)')
                 
                 json_rsp = await self.net.get_roomids(url, page)
@@ -94,10 +94,10 @@ class WebServer():
             
         base_url = 'http://api.live.bilibili.com'
         urls = [
-            f'{base_url}/area/liveList?area=all&order=online&page=',
+            f'{base_url}/room/v1/Area/getListByAreaID?areaId=0&sort=online&pageSize=40&page=',
             f'{base_url}/room/v1/room/get_user_recommend?page=',
-            f'{base_url}/area/liveList?area=all&order=online&page=',
-            f'{base_url}/room/v1/room/get_user_recommend?page='
+            f'{base_url}/room/v1/Area/getListByAreaID?areaId=0&sort=online&pageSize=40&page=',
+            f'{base_url}/room/v1/room/get_user_recommend?page=',
         ]
         roomlists = [await fetch_room(urls[0])]
         for url in urls[1:]:
