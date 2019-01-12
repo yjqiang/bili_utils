@@ -20,7 +20,7 @@ class WebServer():
     async def intro(self, request):
         data = {
             'code': 0,
-            'version': '1.1.5',
+            'version': '1.1.6',
             'latest_refresh': self.latest_refresh,
             'latest_refresh_dyn_num': self.latest_refresh_dyn_num
             }
@@ -53,7 +53,7 @@ class WebServer():
                            
     async def fetch_rooms(self, request):
         start = request.match_info.get('start', 0)
-        end = request.match_info.get('end', 7000)
+        end = request.match_info.get('end', 7200)
         try:
             start = int(start)
             end = int(end)
@@ -114,7 +114,7 @@ class WebServer():
         self.latest_refresh_dyn_num.append(len(unique_rooms))
         roomid_conf = self.static_rooms
         for i in roomid_conf:
-            if len(unique_rooms) >= 7000:
+            if len(unique_rooms) >= 7200:
                 break
             if i not in unique_rooms:
                 unique_rooms.append(i)
