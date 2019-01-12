@@ -74,6 +74,10 @@ class WebHub:
             return data['room_id'], data['uid']
         elif json_rsp['code'] == 60004:
             return None, None
+        elif json_rsp['code'] == 60005:
+            with open('bili.log', 'a', encoding='utf-8') as f:
+                f.write(f'{json_rsp} {roomid}\n')
+            return None, None
         else:
             print(f'{roomid}的房间获取过程中发生错误，{json_rsp}')
             sys.exit(-1)

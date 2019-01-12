@@ -1,7 +1,7 @@
 '''
 save_all 查找readable开头的toml文件
-save_one 对每个readable文件分批次运行，400一个批次，全部运行后，保存toml
-输出文件为[(roomid, follower_num), (roomid, follower_num) ...], 过滤了粉丝少于1000的主播
+save_one 对每个readable文件分批次运行，10一个批次，全部运行后，保存toml
+输出文件为[(roomid, follower_num), (roomid, follower_num) ...], 过滤了粉丝少于500的主播
 v0.9.6+ toml会输出为[[roomid, follower_num], [roomid, follower_num] ...]
 '''
 import asyncio
@@ -66,7 +66,7 @@ async def save_all():
         chuncks = [list_tuple_roomid_uid[x: x+10] for x in range(0, len_list_tuple_roomid_uid, 10)]
         last_piece = chuncks[-1]
         print(f'一共{len_list_tuple_roomid_uid}数据,分片情况为{len(chuncks)}份，最后一份为{len(last_piece)}')
-        print(f'数据校验位为{len_list_tuple_roomid_uid - (len(chuncks) - 1) * 400 - len(last_piece)}')
+        print(f'数据校验位为{len_list_tuple_roomid_uid - (len(chuncks) - 1) * 10 - len(last_piece)}')
         await save_one(file_url, chuncks)
     
 
