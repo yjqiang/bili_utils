@@ -20,7 +20,7 @@ class WebServer():
     async def intro(self, request):
         data = {
             'code': 0,
-            'version': '1.1.7',
+            'version': '1.1.8',
             'latest_refresh': self.latest_refresh,
             'latest_refresh_dyn_num': self.latest_refresh_dyn_num
             }
@@ -65,6 +65,7 @@ class WebServer():
         
     async def refresh(self):
         latest_refresh_start = timestamp()
+        
         async def fetch_room(url):
             rooms = []
             for page in range(1, 250):
@@ -114,7 +115,7 @@ class WebServer():
         self.latest_refresh_dyn_num.append(len(unique_rooms))
         roomid_conf = self.static_rooms
         for i in roomid_conf:
-            if len(unique_rooms) >= 7200:
+            if len(unique_rooms) >= len(self.static_rooms):
                 break
             if i not in unique_rooms:
                 unique_rooms.append(i)
@@ -127,7 +128,8 @@ class WebServer():
 def timestamp():
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return time_now
-            
+           
+             
 async def init(loop):
     app = web.Application(loop=loop)
     webserver = WebServer()
