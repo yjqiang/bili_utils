@@ -20,7 +20,7 @@ class WebServer():
     async def intro(self, request):
         data = {
             'code': 0,
-            'version': '1.1.6',
+            'version': '1.1.7',
             'latest_refresh': self.latest_refresh,
             'latest_refresh_dyn_num': self.latest_refresh_dyn_num
             }
