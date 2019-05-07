@@ -1,15 +1,16 @@
-'''
-init_min 寻找当前文件夹内文件，用来初始化min，用于中断后的重启
+"""init_min 寻找当前文件夹内文件，用来初始化min，用于中断后的重启
 save_all 确定规模50w一个文件
 save_one 50w分批次运行，400一个批次，全部运行50w后(过滤短号；过滤不开播的直播间，根据排行榜过滤)，保存toml
-输出文件为[(roomid, uid), (roomid, uid) ...]
-v0.9.6+ toml会输出为[[roomid, uid], [roomid, uid] ...]
-'''
+输出文件为[[roomid, uid], [roomid, uid] ...]
+"""
 import asyncio
 import sys
-import toml
 import os
+
+import toml
+
 from bili_web import WebHub
+from bili_global import DIRECTORY_ROOMID_UID
 
 
 async def save_one(room_min, room_max):
@@ -47,15 +48,19 @@ async def save_one(room_min, room_max):
     
     dict_title = {'roomid': list_rooms}
 
-    with open(f'roomid_uid{room_min}-{room_max-1}({len(list_rooms)}).toml', 'w', encoding="utf-8") as f:
+    with open(
+            f'{DIRECTORY_ROOMID_UID}/roomid_uid{room_min}-{room_max-1}({len(list_rooms)}).toml',
+            'w', encoding="utf-8") as f:
         toml.dump(dict_title, f)
  
                
 def init_min(min_room, max_room, step):
-    files = [f for f in os.listdir('.') if os.path.isfile(f)]
+    files = [f'{DIRECTORY_ROOMID_UID}/{f}' for f in os.listdir(DIRECTORY_ROOMID_UID)
+             if os.path.isfile(f'{DIRECTORY_ROOMID_UID}/{f}')]
     finished_range_mins = []
     for f in files:
-        if f[-6:] == ').toml' and f[:10] == 'roomid_uid':
+        file_name = os.path.basename(f)
+        if file_name.endswith(').toml') and file_name.startswith('roomid_uid'):
             print(f'找到文件{f}')
             finished_range_mins.append(int(f[10:].split('-')[0]))
     for i in range(min_room, max_room, step):
@@ -63,6 +68,7 @@ def init_min(min_room, max_room, step):
             print('初始化', i)
             return i
         
+
 async def save_all():
     min_room = 0
     max_room = 16000000

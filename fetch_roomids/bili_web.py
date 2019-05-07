@@ -47,18 +47,33 @@ class WebHub:
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
                 continue
     
-    async def fetch_follow_num(self, real_roomid, uid):
+    async def fetch_follow_num(self, uid):
         while True:
             url = f'https://api.live.bilibili.com/relation/v1/Feed/GetUserFc?follow={uid}'
             json_rsp = await self.session_get(url)
             if not json_rsp['code'] and 'fc' in json_rsp['data']:
                 # int
-                return real_roomid, json_rsp['data']['fc']
+                return json_rsp['data']['fc']
             elif json_rsp['code'] == -1:
                 print(f'{uid}的用户获取过程中发生错误，{json_rsp}, 稍后重试，如果一直刷请反馈')
             else:
                 print(f'{uid}的用户获取过程中发生错误，{json_rsp}, 请反馈')
                 sys.exit(-1)
+            await asyncio.sleep(1)
+
+    async def fetch_guard_num(self, uid) -> int:
+        while True:
+            url = f'https://api.live.bilibili.com/guard/topList?ruid={uid}'
+            json_rsp = await self.session_get(url)
+            if not json_rsp['code'] and 'info' in json_rsp['data']:
+                info = json_rsp['data']['info']
+                if 'num' in info:
+                    # int
+                    return int(info['num'])
+            else:
+                print(f'{uid}的用户获取过程中发生错误，{json_rsp}, 请反馈')
+                sys.exit(-1)
+            print(json_rsp)
             await asyncio.sleep(1)
     
     async def fetch_room_info(self, roomid):
