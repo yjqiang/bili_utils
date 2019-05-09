@@ -38,7 +38,7 @@ async def save_one(room_min, room_max):
         if tasklist1:
             results = await asyncio.gather(*tasklist1)
             for num, roomid, uid in results:
-                if num >= 8:
+                if num >= 7:
                     list_rooms.append((roomid, uid))
         print(f'当前一共{len(list_rooms)}个房间({room_min}-{i+step-1})')
 
