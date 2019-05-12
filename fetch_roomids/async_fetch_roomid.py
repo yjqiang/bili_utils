@@ -62,11 +62,12 @@ def init_min(min_room, max_room, step):
         file_name = os.path.basename(f)
         if file_name.endswith(').toml') and file_name.startswith('roomid_uid'):
             print(f'找到文件{f}')
-            finished_range_mins.append(int(f[10:].split('-')[0]))
+            finished_range_mins.append(int(file_name[10:].split('-')[0]))
     for i in range(min_room, max_room, step):
         if i not in finished_range_mins:
             print('初始化', i)
             return i
+    return None
         
 
 async def save_all():
@@ -75,7 +76,8 @@ async def save_all():
     step = 500000
     # 收录从min到(max_room-1),min max必须被500000整除
     min_room = init_min(min_room, max_room, step)
-    
+    if min_room is None:
+        return
     for i in range(min_room, max_room, step):
         await save_one(i, i + step)
 
