@@ -20,7 +20,7 @@ class WebServer():
     async def intro(self, request):
         data = {
             'code': 0,
-            'version': '1.1.9',
+            'version': '1.1.10b',
             'latest_refresh': self.latest_refresh,
             'latest_refresh_dyn_num': self.latest_refresh_dyn_num
             }
@@ -111,6 +111,7 @@ class WebServer():
                 if room is not None and room not in unique_rooms:
                     unique_rooms.append(room)
         print(f'动态方法总获取房间{len(unique_rooms)}')
+        unique_rooms = unique_rooms[:1300]
         self.latest_refresh_dyn_num = [len(rooms) for rooms in roomlists]
         self.latest_refresh_dyn_num.append(len(unique_rooms))
         roomid_conf = self.static_rooms
