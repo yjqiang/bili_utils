@@ -72,7 +72,7 @@ def init_min(min_room, max_room, step):
 
 async def save_all():
     min_room = 0
-    max_room = 16000000
+    max_room = 22500000
     step = 500000
     # 收录从min到(max_room-1),min max必须被500000整除
     min_room = init_min(min_room, max_room, step)
