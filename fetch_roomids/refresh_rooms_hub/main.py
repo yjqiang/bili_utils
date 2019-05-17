@@ -21,7 +21,7 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.2.0b0',
+            'version': '1.2.0b1',
             'latest_refresh': self.latest_refresh,
             'latest_refresh_dyn_num': self.latest_refresh_dyn_num
             }
@@ -110,7 +110,9 @@ class WebServer:
                 if room is not None and room not in dyn_rooms:
                     dyn_rooms.append(room)
 
-        self.latest_refresh_dyn_num = [len(rooms) for rooms in roomlists].append(len(dyn_rooms))
+        latest_refresh_dyn_num = [len(rooms) for rooms in roomlists]
+        latest_refresh_dyn_num.append(len(dyn_rooms))
+        self.latest_refresh_dyn_num = latest_refresh_dyn_num
 
         new_rooms = self.static_rooms  # 新房间先填固定房间
         for room_id in dyn_rooms:  # 填动态房间
