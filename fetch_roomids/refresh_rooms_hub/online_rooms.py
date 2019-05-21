@@ -1,10 +1,12 @@
 import asyncio
+from itertools import zip_longest
 
 import toml
 
 from printer import info as print
 from tasks.utils import UtilsTask
 import utils
+from static_rooms import var_static_room_checker
 
 
 class OnlineRoomChecker:
@@ -15,6 +17,7 @@ class OnlineRoomChecker:
         self.latest_refresh = ''
         assert len(self.rooms) == len(set(self.rooms))
         self.latest_refresh_dyn_num = []
+        self.static_rooms = var_static_room_checker.get_rooms()
 
     async def refresh(self):
         print(f'正在刷新查看ONLINE房间')
@@ -39,7 +42,7 @@ class OnlineRoomChecker:
             dyn_rooms = self.rooms[:2000-max_len]  # 延时操作，房间很多的时候，就减少比重
         '''
         dyn_rooms = []
-        for rooms in roomlists:
+        for rooms in zip_longest(*roomlists):  # 这里是为了保持优先级
             for room in rooms:
                 if room and room not in dyn_rooms:
                     dyn_rooms.append(room)
