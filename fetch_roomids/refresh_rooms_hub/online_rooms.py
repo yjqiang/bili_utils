@@ -24,10 +24,10 @@ class OnlineRoomChecker:
         latest_refresh_start = utils.timestamp()
         base_url = 'http://api.live.bilibili.com'
         urls = [
-            f'{base_url}/room/v1/Area/getListByAreaID?areaId=0&sort=online&pageSize=40&page=',
-            f'{base_url}/room/v1/room/get_user_recommend?page=',
-            f'{base_url}/room/v1/Area/getListByAreaID?areaId=0&sort=online&pageSize=40&page=',
-            f'{base_url}/room/v1/room/get_user_recommend?page=',
+            f'{base_url}/room/v1/Area/getListByAreaID?areaId=0&sort=online&pageSize=60&page=',
+            f'{base_url}/room/v1/room/get_user_recommend?page_size=60&page=',
+            f'{base_url}/room/v1/Area/getListByAreaID?areaId=0&sort=online&pageSize=60&page=',
+            f'{base_url}/room/v1/room/get_user_recommend?page_size=60&page=',
         ]
         roomlists = [await UtilsTask.fetch_rooms_from_bili(urls[0])]
         for url in urls[1:]:
