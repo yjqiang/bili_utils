@@ -61,14 +61,14 @@ class UtilsTask:
     @staticmethod
     async def fetch_rooms_from_bili(url):
         rooms = []
-        for page in range(1, 250):
+        for page in range(1, 40):
             if not (page % 20):
                 print(f'{url}截止第{page}页，获取{len(rooms)}个房间(可能重复)')
 
             json_rsp = await UtilsReq.fetch_rooms_from_bili(url, page)
             data = json_rsp['data']
 
-            if not data or max(room['online'] for room in data) <= 30:
+            if not data:
                 print(f'{url}截止结束页（第{page}页），获取{len(rooms)}个房间(可能重复)')
                 break
             for room in data:
