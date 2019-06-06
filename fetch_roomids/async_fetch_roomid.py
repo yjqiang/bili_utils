@@ -33,7 +33,7 @@ async def save_one(chuncks):
         if tasks:
             results = await asyncio.gather(*tasks)
             for roomid_uid, num in zip(list_roomid_uid, results):
-                if num >= 7:
+                if num >= 5:
                     list_rooms.append(roomid_uid)
         print(f'当前一共{len(list_rooms)}个房间({piece[0]}-{piece[-1]})')
 
