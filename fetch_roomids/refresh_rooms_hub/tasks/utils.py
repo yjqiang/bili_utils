@@ -2,6 +2,7 @@ import random
 import asyncio
 
 import printer
+import utils
 from reqs.utils import UtilsReq
 
 
@@ -82,3 +83,28 @@ class UtilsTask:
                 unique_rooms.append(room_id)
         print('去重之后', len(unique_rooms))
         return unique_rooms
+
+
+    @staticmethod
+    async def add_new_roomids(client, privkey, room_ids):
+        dict_signature = utils.make_signature(
+            'SERVER',
+            privkey,
+            need_name=True)
+
+        data = {
+            'code': 0,
+            'data': {
+                'new_roomids': room_ids
+            },
+            'verification': dict_signature
+        }
+        json_rsp = await UtilsReq.add_new_roomids(client, data)
+        return json_rsp['data']['sleep_time']
+
+    @staticmethod
+    async def check_client(client):
+        json_rsp = await UtilsReq.check_client(client)
+        return json_rsp['data']
+
+
