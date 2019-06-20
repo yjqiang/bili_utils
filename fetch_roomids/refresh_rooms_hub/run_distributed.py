@@ -1,11 +1,10 @@
 import asyncio
-from datetime import datetime
 from itertools import zip_longest
 from random import shuffle
 from os import path
 
 import rsa
-from aiohttp import web, ClientSession
+from aiohttp import web
 
 import utils
 from tasks.utils import UtilsTask
@@ -13,14 +12,14 @@ from static_rooms import var_static_room_checker
 
 
 loop = asyncio.get_event_loop()
-distributed_clients = ['http://127.0.0.1:9001',]  # eg: ['http://127.0.0.1:8003',]
+distributed_clients = []  # eg: ['http://127.0.0.1:8003',]
 
 
 class WebServer:
     def __init__(self, admin_privkey: rsa.PrivateKey):
         self.rooms = []
-        self.latest_refresh = []
-        self.latest_refresh = []
+        self.latest_refresh = ''
+        self.latest_refresh_dyn_num = []
         self.static_rooms = var_static_room_checker.get_rooms()
         self.admin_privkey = admin_privkey
         self.remain_roomids = 0
@@ -28,9 +27,9 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.0.0b0',
+            'version': '1.0.0b1',
             'online_rooms_latest_refresh': self.latest_refresh,
-            'online_rooms_num': self.latest_refresh,
+            'online_rooms_num': self.latest_refresh_dyn_num,
             'remain_roomids': self.remain_roomids
         }
         return web.json_response(data)
@@ -60,8 +59,8 @@ class WebServer:
         latest_refresh_start = utils.timestamp()
         base_url = 'http://api.live.bilibili.com'
         urls = [
-            f'{base_url}/room/v1/Area/getListByAreaID?areaId=0&sort=online&pageSize=160&page=',
-            f'{base_url}/room/v1/room/get_user_recommend?page_size=160&page=',
+            f'{base_url}/room/v1/Area/getListByAreaID?areaId=0&sort=online&pageSize=170&page=',
+            f'{base_url}/room/v1/room/get_user_recommend?page_size=170&page=',
         ]
         roomlists = [await UtilsTask.fetch_rooms_from_bili(urls[0])]
         for url in urls[1:]:
@@ -76,6 +75,7 @@ class WebServer:
 
         latest_refresh_dyn_num = [len(rooms) for rooms in roomlists]
         latest_refresh_dyn_num.append(len(dyn_rooms))
+        self.latest_refresh_dyn_num = latest_refresh_dyn_num
         latest_refresh_end = utils.timestamp()
         self.latest_refresh = f'{latest_refresh_start} to {latest_refresh_end}'
         self.rooms = dyn_rooms
@@ -83,8 +83,7 @@ class WebServer:
     async def push_roomids(self) -> float:  # 休眠时间
         print('正在推送房间')
         shuffle(distributed_clients)
-        rooms = [i for i in self.rooms if i not in self.static_rooms]
-
+        rooms = [i for i in self.rooms if i not in self.static_rooms]  # 过滤出静态房间
 
         roomids_monitored = []  # 所有的正在监控的房间
         remain_roomids = []  # 每个 client 的空余量
@@ -107,7 +106,6 @@ class WebServer:
             self.remain_roomids = max(self.remain_roomids, len(new_roomids) - cursor)
             return sleep_time
         return 0
-        
 
 
 async def init():
@@ -130,7 +128,6 @@ async def init():
         await webserver.refresh()
         await asyncio.sleep(wanted_time-utils.curr_time()+3)
         wanted_time = utils.curr_time() + await webserver.push_roomids()
-
 
 
 loop.run_until_complete(init())
