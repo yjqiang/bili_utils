@@ -13,7 +13,7 @@ from printer import info as print
 
 
 loop = asyncio.get_event_loop()
-distributed_clients = []  # eg: ['http://127.0.0.1:8003',]
+distributed_clients = ['http://127.0.0.1:9001', ]  # eg: ['http://127.0.0.1:9001', ]
 
 
 class OnlineRoomNotStaticCheckers:  # 在线房间，剔除静态的结果
@@ -38,14 +38,16 @@ class WebServer:
         self.checker = OnlineRoomNotStaticCheckers()
 
         self.admin_privkey = admin_privkey
-        self.remain_roomids = 0
+        self.max_remain_roomids = 0
+        self.max_num_roomids = -1
 
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.0.0b2',
+            'version': '1.0.0b3',
             **self.checker.status(),
-            'remain_roomids': self.remain_roomids
+            'max_remain_roomids': self.max_remain_roomids,
+            'max_num_roomids': self.max_num_roomids
         }
         return web.json_response(data)
 
@@ -71,6 +73,7 @@ class WebServer:
 
     async def refresh_and_get_rooms(self):
         self.rooms = await self.checker.refresh_and_get_rooms()
+        self.max_num_roomids = max(self.max_num_roomids, len(self.rooms))
         
     async def push_roomids(self) -> float:  # 休眠时间
         print('正在准备推送房间')
@@ -97,7 +100,7 @@ class WebServer:
                     sleep_time = max(
                         sleep_time, await UtilsTask.add_new_roomids(client, self.admin_privkey, roomid_sent))
                 cursor += remain_roomids[i]
-            self.remain_roomids = max(self.remain_roomids, len(new_roomids) - cursor)
+            self.max_remain_roomids = max(self.max_remain_roomids, len(new_roomids) - cursor)
             return sleep_time
         return 0
 
