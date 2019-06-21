@@ -74,7 +74,7 @@ class UtilsTask:
                 break
             for room in data:
                 rooms.append(int(room['roomid']))
-            await asyncio.sleep(0.16)
+            await asyncio.sleep(0.17)
 
         print('去重之前', len(rooms))
         unique_rooms = []

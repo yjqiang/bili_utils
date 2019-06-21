@@ -39,7 +39,7 @@ class WebSession:
                                     return json_body
                                 elif json_rsp_type == JsonRspType.IGNORE:
                                     await asyncio.sleep(1.0)
-                        elif rsp.status == 403:
+                        elif rsp.status in (412, 403):
                             printer.warn(f'403频繁, {url}')
                             await asyncio.sleep(240)
                 except asyncio.CancelledError:
