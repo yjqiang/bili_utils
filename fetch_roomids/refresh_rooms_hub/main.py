@@ -51,7 +51,7 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.2.0b3',
+            'version': '1.2.0b4',
             **self.checker.status()
             }
         return web.json_response(data)
@@ -117,7 +117,7 @@ async def init():
 
     # 弹幕运行
     session = ClientSession()
-    for area_id in [1, 2, 3, 4, 5, 6]:
+    for area_id in [1, 2, 3, 4, 5, 6, 7]:
         monitor = DanmuRaffleMonitor(
             room_id=0,
             area_id=area_id,

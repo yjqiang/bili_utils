@@ -72,6 +72,7 @@ class DanmuRoomChecker:
         self.rooms = rooms
 
     def get_rooms(self) -> list:
+        print(f'弹幕获取 {len(self.rooms)}')
         return self.rooms
 
     def status(self) -> dict:
