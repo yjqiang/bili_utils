@@ -16,9 +16,24 @@ loop = asyncio.get_event_loop()
 distributed_clients = ['http://127.0.0.1:9001', ]  # eg: ['http://127.0.0.1:9001', ]
 
 
+async def check_page_size():
+    max_rooms_num = 0
+    for client in distributed_clients:
+        data = await UtilsTask.check_client(client)
+        max_rooms_num += data['remain_roomids'] + len(data['roomids_monitored'])
+    if max_rooms_num >= 10000:
+        return 200
+    if max_rooms_num >= 7000:
+        return 160
+    return 70
+
+page_size = loop.run_until_complete(check_page_size())
+print(f'PAGE_SIZE = {page_size}')
+
+
 class OnlineRoomNotStaticCheckers:  # 在线房间，剔除静态的结果
     def __init__(self):
-        var_online_room_checker.page_size = 170
+        var_online_room_checker.page_size = page_size
         self.online_room_checker = var_online_room_checker
         self.static_rooms = var_static_room_checker.get_rooms()
 
@@ -44,10 +59,11 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.0.0b4',
+            'version': '1.0.0b5',
             **self.checker.status(),
             'max_remain_roomids': self.max_remain_roomids,
-            'max_num_roomids': self.max_num_roomids
+            'max_num_roomids': self.max_num_roomids,
+            'page_size': page_size
         }
         return web.json_response(data)
 

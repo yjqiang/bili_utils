@@ -26,7 +26,7 @@ class OnlineRoomChecker:
         ]
         roomlists = [await UtilsTask.fetch_rooms_from_bili(urls[0])]
         for url in urls[1:]:
-            await asyncio.sleep(6)
+            await asyncio.sleep(5)
             roomlists.append(await UtilsTask.fetch_rooms_from_bili(url))
 
         '''
