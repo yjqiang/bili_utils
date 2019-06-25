@@ -62,7 +62,7 @@ class UtilsTask:
     @staticmethod
     async def fetch_rooms_from_bili(url):
         rooms = []
-        for page in range(1, 40):
+        for page in range(1, 41):
             if not (page % 20):
                 print(f'{url}截止第{page}页，获取{len(rooms)}个房间(可能重复)')
 

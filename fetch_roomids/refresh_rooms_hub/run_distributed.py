@@ -22,7 +22,7 @@ async def check_page_size():
         data = await UtilsTask.check_client(client)
         max_rooms_num += data['remain_roomids'] + len(data['roomids_monitored'])
     if max_rooms_num >= 10000:
-        return 200
+        return 220
     if max_rooms_num >= 7000:
         return 160
     return 70
@@ -59,7 +59,7 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.0.0b5',
+            'version': '1.0.0b6',
             **self.checker.status(),
             'max_remain_roomids': self.max_remain_roomids,
             'max_num_roomids': self.max_num_roomids,
