@@ -13,27 +13,26 @@ from printer import info as print
 
 
 loop = asyncio.get_event_loop()
-distributed_clients = ['http://127.0.0.1:9001', ]  # eg: ['http://127.0.0.1:9001', ]
+ctrl = utils.read_toml(file_path='conf/ctrl.toml')
+distributed_clients = ctrl['distributed_clients']
+url_index = ctrl['url_index']
 
 
-async def check_page_size():
-    max_rooms_num = 0
+async def check_max_rooms_num():
+    sum_num = 0
     for client in distributed_clients:
         data = await UtilsTask.check_client(client)
-        max_rooms_num += data['remain_roomids'] + len(data['roomids_monitored'])
-    if max_rooms_num >= 10000:
-        return 220
-    if max_rooms_num >= 7000:
-        return 160
-    return 70
+        sum_num += data['remain_roomids'] + len(data['roomids_monitored'])
+    return sum_num - 2000
 
-page_size = loop.run_until_complete(check_page_size())
-print(f'PAGE_SIZE = {page_size}')
+max_rooms_num = loop.run_until_complete(check_max_rooms_num())
+assert max_rooms_num > 0
+print(f'MAX_ROOMS_NUM = {max_rooms_num}')
 
 
 class OnlineRoomNotStaticCheckers:  # 在线房间，剔除静态的结果
     def __init__(self):
-        var_online_room_checker.page_size = page_size
+        var_online_room_checker.reset_max_rooms_num(max_rooms_num, url_index=url_index)
         self.online_room_checker = var_online_room_checker
         self.static_rooms = var_static_room_checker.get_rooms()
 
@@ -59,11 +58,11 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.0.0b6',
+            'version': '1.0.0b7',
             **self.checker.status(),
             'max_remain_roomids': self.max_remain_roomids,
             'max_num_roomids': self.max_num_roomids,
-            'page_size': page_size
+            'max_rooms_num': max_rooms_num
         }
         return web.json_response(data)
 

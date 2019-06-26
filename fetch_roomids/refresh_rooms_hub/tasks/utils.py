@@ -60,9 +60,12 @@ class UtilsTask:
         return is_ok
 
     @staticmethod
-    async def fetch_rooms_from_bili(url):
+    async def fetch_rooms_from_bili(url, pages_num):
         rooms = []
-        for page in range(1, 41):
+        page = None
+        for page in range(1, pages_num+1):
+            if page == 41:
+                await asyncio.sleep(5)
             if not (page % 20):
                 print(f'{url}截止第{page}页，获取{len(rooms)}个房间(可能重复)')
 
@@ -70,11 +73,12 @@ class UtilsTask:
             data = json_rsp['data']
 
             if not data:
-                print(f'{url}截止结束页（第{page}页），获取{len(rooms)}个房间(可能重复)')
+
                 break
             for room in data:
                 rooms.append(int(room['roomid']))
             await asyncio.sleep(0.17)
+        print(f'{url}截止结束页（第{page}页），获取{len(rooms)}个房间(可能重复)')
 
         print('去重之前', len(rooms))
         unique_rooms = []
@@ -83,7 +87,6 @@ class UtilsTask:
                 unique_rooms.append(room_id)
         print('去重之后', len(unique_rooms))
         return unique_rooms
-
 
     @staticmethod
     async def add_new_roomids(client, privkey, room_ids):
@@ -106,5 +109,3 @@ class UtilsTask:
     async def check_client(client):
         json_rsp = await UtilsReq.check_client(client)
         return json_rsp['data']
-
-

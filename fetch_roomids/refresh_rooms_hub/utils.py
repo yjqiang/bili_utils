@@ -3,6 +3,8 @@ import base64
 from time import time
 from datetime import datetime
 
+import toml
+
 
 def curr_time():
     return int(time())
@@ -35,3 +37,8 @@ def make_signature(name: str, privkey: rsa.PrivateKey, need_name=True) -> dict:
         'signature': str_signature,
         'time': int_curr_time
     }
+
+
+def read_toml(file_path):
+    with open(file_path, encoding="utf-8") as f:
+        return toml.load(f)
