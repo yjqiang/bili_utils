@@ -19,7 +19,7 @@ class OnlineRoomChecker:
 
     def reset_max_rooms_num(self, num: int, url_index: int):  # 大约的数据
         base_url = 'http://api.live.bilibili.com'
-        url0_page_size = max(200, int(num/40))
+        url0_page_size = max(200, int(num/50))
         url0_pages_num = int(num / url0_page_size)
 
         url1_page_size = 100
@@ -44,7 +44,7 @@ class OnlineRoomChecker:
         latest_refresh_start = utils.timestamp()
         roomlists = [await UtilsTask.fetch_rooms_from_bili(*self.urls[0])]
         for url, pages_num in self.urls[1:]:
-            await asyncio.sleep(5)
+            await asyncio.sleep(3)
             roomlists.append(await UtilsTask.fetch_rooms_from_bili(url, pages_num))
 
         '''

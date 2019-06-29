@@ -23,7 +23,7 @@ async def check_max_rooms_num():
     for client in distributed_clients:
         data = await UtilsTask.check_client(client)
         sum_num += data['remain_roomids'] + len(data['roomids_monitored'])
-    return sum_num - 2000
+    return sum_num - 1000
 
 max_rooms_num = loop.run_until_complete(check_max_rooms_num())
 assert max_rooms_num > 0
@@ -58,7 +58,7 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.0.0b7',
+            'version': '1.0.0b8',
             **self.checker.status(),
             'max_remain_roomids': self.max_remain_roomids,
             'max_num_roomids': self.max_num_roomids,

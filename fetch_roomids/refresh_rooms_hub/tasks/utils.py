@@ -64,8 +64,8 @@ class UtilsTask:
         rooms = []
         page = None
         for page in range(1, pages_num+1):
-            if page == 41:
-                await asyncio.sleep(5)
+            if page == 51:
+                await asyncio.sleep(3)
             if not (page % 20):
                 print(f'{url}截止第{page}页，获取{len(rooms)}个房间(可能重复)')
 
@@ -73,11 +73,10 @@ class UtilsTask:
             data = json_rsp['data']
 
             if not data:
-
                 break
             for room in data:
                 rooms.append(int(room['roomid']))
-            await asyncio.sleep(0.17)
+            await asyncio.sleep(0.05)
         print(f'{url}截止结束页（第{page}页），获取{len(rooms)}个房间(可能重复)')
 
         print('去重之前', len(rooms))
