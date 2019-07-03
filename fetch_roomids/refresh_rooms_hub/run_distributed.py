@@ -58,7 +58,7 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.0.0b8',
+            'version': '1.0.0b9',
             **self.checker.status(),
             'max_remain_roomids': self.max_remain_roomids,
             'max_num_roomids': self.max_num_roomids,
@@ -140,6 +140,7 @@ async def init():
         await webserver.refresh_and_get_rooms()
         await asyncio.sleep(wanted_time-utils.curr_time()+3)
         wanted_time = utils.curr_time() + await webserver.push_roomids()
+        await asyncio.sleep(2)
 
 
 loop.run_until_complete(init())
