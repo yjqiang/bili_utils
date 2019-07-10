@@ -51,7 +51,7 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.2.0b4',
+            'version': '1.2.1b0',
             **self.checker.status()
             }
         return web.json_response(data)
