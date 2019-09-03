@@ -34,11 +34,10 @@ class OnlineRoomNotStaticCheckers:  # 在线房间，剔除静态的结果
     def __init__(self):
         var_online_room_checker.reset_max_rooms_num(max_rooms_num, url_index=url_index)
         self.online_room_checker = var_online_room_checker
-        self.static_rooms = var_static_room_checker.get_rooms()
+        self.static_rooms = var_static_room_checker.rooms
 
     async def refresh_and_get_rooms(self):
-        await self.online_room_checker.refresh()
-        rooms = self.online_room_checker.get_rooms()
+        rooms = await self.online_room_checker.get_rooms()
         return [i for i in rooms if i not in self.static_rooms]  # 过滤掉静态房间里面的
 
     def status(self) -> dict:
@@ -58,7 +57,7 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.0.1b0',
+            'version': '2.0.0b0',
             **self.checker.status(),
             'max_remain_roomids': self.max_remain_roomids,
             'max_num_roomids': self.max_num_roomids,

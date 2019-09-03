@@ -1,12 +1,11 @@
 import asyncio
 from datetime import datetime
 
-from aiohttp import web, ClientSession
+from aiohttp import web
 
 from danmu_rooms import var_danmu_rooms_checker
 from static_rooms import var_static_room_checker
-from online_rooms import var_online_room_checker
-from danmu.bili_danmu_monitor import DanmuRaffleMonitor
+from rank_rooms import var_rank_room_checker
 from printer import info as print
 
 
@@ -15,15 +14,12 @@ loop = asyncio.get_event_loop()
 
 class RoomCheckers:
     def __init__(self):
-        self.checkers = [var_static_room_checker, var_danmu_rooms_checker, var_online_room_checker]
+        self.checkers = [var_static_room_checker, var_danmu_rooms_checker, var_rank_room_checker]
 
     async def refresh_and_get_rooms(self):
-        for check in self.checkers:
-            await check.refresh()
-
         rooms = []
         for checker in self.checkers:
-            for room in checker.get_rooms():  # 填动态房间
+            for room in await checker.get_rooms():  # 填动态房间
                 if room not in rooms:
                     rooms.append(room)
         print(f'合计总获取房间{len(rooms)}')
@@ -32,7 +28,7 @@ class RoomCheckers:
     def status(self) -> dict:
         result = {}
         for check in self.checkers:
-            result.update(check.status())
+            result[check.NAME] = check.status()
         return result
 
     async def run(self):
@@ -51,7 +47,7 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '1.2.1b0',
+            'version': '2.0.0b0',
             **self.checker.status()
             }
         return web.json_response(data)
@@ -97,6 +93,9 @@ class WebServer:
     async def refresh(self):
         self.rooms = await self.checker.refresh_and_get_rooms()
 
+    async def run(self):
+        await self.checker.run()
+
 
 async def init():
     app = web.Application()
@@ -115,14 +114,7 @@ async def init():
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', 8000)
 
-    # 弹幕运行
-    session = ClientSession()
-    for area_id in [1, 2, 3, 4, 5, 6, 7]:
-        monitor = DanmuRaffleMonitor(
-            room_id=0,
-            area_id=area_id,
-            session=session)
-        loop.create_task(monitor.run())
+    loop.create_task(webserver.run())
 
     await webserver.refresh()
 

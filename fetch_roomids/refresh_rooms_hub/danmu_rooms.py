@@ -1,13 +1,18 @@
+# 弹幕抽奖，后台运行
 from typing import Dict
+import asyncio
 
 import attr
+from aiohttp import ClientSession
 
 import utils
-from printer import info as print
 from static_rooms import var_static_room_checker
+from refresher import Refresher
+from danmu.bili_danmu_monitor import DanmuRaffleMonitor
+from tasks.utils import UtilsTask
 
 
-@attr.s
+@attr.s(slots=True)
 class DanmuRoom:
     # 保持有效的时间
     GUARD_DELAY = 3600 * 24 * 15
@@ -40,16 +45,17 @@ class DanmuRoom:
             self.latest_storm_time = utils.curr_time()
 
 
-class DanmuRoomChecker:
+class DanmuRoomChecker(Refresher):
+    NAME = 'DANMU'
+
     def __init__(self):
         self.dict_danmu_rooms: Dict[int, DanmuRoom] = {}
-        self.rooms = []
-        self.static_rooms = var_static_room_checker.get_rooms()
+        self.static_rooms = var_static_room_checker.rooms
 
     def add2rooms(self, real_roomid: int, raffle_type: str):
         if real_roomid in self.static_rooms:
-            print('弹幕推送命中静态房间')
             return
+        # print(f'正在刷新{real_roomid}（未存在于静态房间）')
         if real_roomid in self.dict_danmu_rooms:
             danmu_room = self.dict_danmu_rooms[real_roomid]
         else:
@@ -57,28 +63,36 @@ class DanmuRoomChecker:
             self.dict_danmu_rooms[real_roomid] = danmu_room
 
         danmu_room.update(raffle_type)
-        print(f'已经加入或更新{real_roomid}')
+        # print(f'已经加入或更新{real_roomid}')
 
     async def refresh(self):
-        print('正在重新刷新DANMU房间')
-        self.dict_danmu_rooms = {key: value for key, value in self.dict_danmu_rooms.items() if value.weight}
-
-        danmu_rooms = [i for i in self.dict_danmu_rooms.values()]
-        danmu_rooms.sort(key=lambda danm_room: danm_room.weight, reverse=True)
-
-        rooms = [danmu_room.real_roomid for danmu_room in danmu_rooms][:3500]  # 防止过多
+        rooms = [real_roomid for real_roomid in self.dict_danmu_rooms.keys()]
+        rooms.sort(key=lambda real_roomid: self.dict_danmu_rooms[real_roomid].weight, reverse=True)
+        rooms = rooms[:1500]  # 防止过多
         assert len(rooms) == len(set(rooms))
-        self.dict_danmu_rooms = {room: value for room, value in self.dict_danmu_rooms.items() if room in rooms}
-        self.rooms = rooms
 
-    def get_rooms(self) -> list:
-        print(f'弹幕获取 {len(self.rooms)}')
-        return self.rooms
+        self.dict_danmu_rooms = {real_roomid: self.dict_danmu_rooms[real_roomid] for real_roomid in rooms}
+        return rooms
 
     def status(self) -> dict:
         return {
-            'danmu_rooms_num': len(self.rooms),
+            'danmu_realtime': len(self.dict_danmu_rooms)
         }
+
+    async def run(self):
+        loop = asyncio.get_event_loop()
+        # 弹幕运行
+        session = ClientSession()
+        tasks = []
+        for area_id in await UtilsTask.fetch_blive_areas():
+            monitor = DanmuRaffleMonitor(
+                room_id=0,
+                area_id=area_id,
+                session=session,
+                add2rooms=self.add2rooms
+            )
+            tasks.append(loop.create_task(monitor.run()))
+        await asyncio.wait(tasks)
 
 
 var_danmu_rooms_checker = DanmuRoomChecker()

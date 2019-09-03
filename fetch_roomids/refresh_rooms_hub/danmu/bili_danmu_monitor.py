@@ -1,18 +1,18 @@
 import asyncio
-from typing import Optional
+from typing import Optional, Callable
 
 from aiohttp import ClientSession
 
 from printer import info as print
 from .bili_danmu import WsDanmuClient
 from tasks.utils import UtilsTask
-from danmu_rooms import var_danmu_rooms_checker
 
 
 class DanmuRaffleMonitor(WsDanmuClient):
     def __init__(
-            self, room_id: int, area_id: int,
+            self, room_id: int, area_id: int, add2rooms: Callable,
             session: Optional[ClientSession] = None, loop=None):
+        self.add2rooms = add2rooms
         super().__init__(
             room_id=room_id,
             area_id=area_id,
@@ -66,13 +66,13 @@ class DanmuRaffleMonitor(WsDanmuClient):
                 else:
                     raffle_name = str_gift
                 print(f'{self._area_id}号数据连接检测到{real_roomid:^9}的{raffle_name}')
-                var_danmu_rooms_checker.add2rooms(real_roomid, 'TV')
+                self.add2rooms(real_roomid, 'TV')
             elif msg_type == 3:
                 raffle_name = msg_common.split('开通了')[-1][:2]
                 print(f'{self._area_id}号数据连接检测到{real_roomid:^9}的{raffle_name}')
-                var_danmu_rooms_checker.add2rooms(real_roomid, 'GUARD')
+                self.add2rooms(real_roomid, 'GUARD')
             elif msg_type == 6:
                 raffle_name = '二十倍节奏风暴'
                 print(f'{self._area_id}号数据连接检测到{real_roomid:^9}的{raffle_name}')
-                var_danmu_rooms_checker.add2rooms(real_roomid, 'STORM')
+                self.add2rooms(real_roomid, 'STORM')
         return True

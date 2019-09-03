@@ -1,21 +1,22 @@
+# 在线房间，被动前台刷新
 import asyncio
 from itertools import zip_longest
 
-from printer import info as print
 from tasks.utils import UtilsTask
 import utils
 from static_rooms import var_static_room_checker
+from refresher import Refresher
 
 
-class OnlineRoomChecker:
+class OnlineRoomChecker(Refresher):
+    NAME = 'ONLINE'
+
     def __init__(self):
         self.urls = []
         self.reset_max_rooms_num(3000, -1)
-        self.rooms = []
         self.latest_refresh = ''
-        assert len(self.rooms) == len(set(self.rooms))
         self.latest_refresh_dyn_num = []
-        self.static_rooms = var_static_room_checker.get_rooms()
+        self.static_rooms = var_static_room_checker.rooms
 
     def reset_max_rooms_num(self, num: int, url_index: int):  # 大约的数据
         base_url = 'http://api.live.bilibili.com'
@@ -40,20 +41,12 @@ class OnlineRoomChecker:
             self.urls = [urls[url_index]]
 
     async def refresh(self):
-        print(f'正在刷新查看ONLINE房间')
         latest_refresh_start = utils.timestamp()
         roomlists = [await UtilsTask.fetch_rooms_from_bili(*self.urls[0])]
         for url, pages_num in self.urls[1:]:
             await asyncio.sleep(3)
             roomlists.append(await UtilsTask.fetch_rooms_from_bili(url, pages_num))
 
-        '''
-        max_len = max(len(rooms) for rooms in roomlists)
-        if max_len >= 2000:
-            dyn_rooms = []
-        else:
-            dyn_rooms = self.rooms[:2000-max_len]  # 延时操作，房间很多的时候，就减少比重
-        '''
         dyn_rooms = []
         for rooms in zip_longest(*roomlists):  # 这里是为了保持优先级
             for room in rooms:
@@ -65,11 +58,7 @@ class OnlineRoomChecker:
         self.latest_refresh_dyn_num = latest_refresh_dyn_num
         latest_refresh_end = utils.timestamp()
         self.latest_refresh = f'{latest_refresh_start} to {latest_refresh_end}'
-        self.rooms = dyn_rooms
-
-    def get_rooms(self) -> list:
-        print(f'动态获取 {len(self.rooms)}')
-        return self.rooms
+        return dyn_rooms
 
     def status(self) -> dict:
         return {

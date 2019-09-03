@@ -5,6 +5,12 @@ API_LIVE = 'https://api.live.bilibili.com'
 
 class UtilsReq:
     @staticmethod
+    async def fetch_blive_areas():
+        url = f'{API_LIVE}/room/v1/Area/getList'
+        rsp = await var_session.request_json('GET', url)
+        return rsp
+
+    @staticmethod
     async def init_room(roomid):
         url = f"{API_LIVE}/room/v1/Room/room_init?id={roomid}"
         response = await var_session.request_json('GET', url)
@@ -36,4 +42,3 @@ class UtilsReq:
     async def check_client(client):
         json_rsp = await var_session.request_json('GET', f'{client}/check')
         return json_rsp
-
