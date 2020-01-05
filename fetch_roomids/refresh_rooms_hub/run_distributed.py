@@ -57,7 +57,7 @@ class WebServer:
     async def intro(self, _):
         data = {
             'code': 0,
-            'version': '2.0.0b0',
+            'version': '2.0.0b1',
             **self.checker.status(),
             'max_remain_roomids': self.max_remain_roomids,
             'max_num_roomids': self.max_num_roomids,

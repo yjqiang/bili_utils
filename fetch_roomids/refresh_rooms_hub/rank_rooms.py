@@ -56,45 +56,50 @@ class RankRoomChecker(Refresher):
         # print(f'已经加入或更新{real_roomid}')
 
     def reset_max_rooms_num(self):  # 大约的数据
-        base_url = 'http://api.live.bilibili.com'
+        base_url = 'https://api.live.bilibili.com'
         urls = [
             (
-                f'{base_url}/rankdb/v1/Rank2018/getTop?type=master_realtime_hour&type_id=areaid_realtime_hour&page_size=12&area_id=',
-                8
+                f'{base_url}/rankdb/v1/Rank2018/getTop?type=master_realtime_hour&type_id=areaid_realtime_hour'
+                f'&page_size=12&area_id=',
+                7
             ),
-            (
-                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20&area_id=0&page=',
-                5
-            ),
-            (
-                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20&area_id=1&page=',
-                5
-            ),
-            (
-                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20&area_id=2&page=',
-                5
-            ),
-            (
-                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20&area_id=3&page=',
-                5
-            ),
-            (
-                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20&area_id=4&page=',
-                5
-            ),
-            (
-                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20&area_id=5&page=',
-                5
-            ),
-            (
-                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20&area_id=6&page=',
-                5
-            ),
-            (
-                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20&area_id=7&page=',
-                5
-            )
 
+            # https://live.bilibili.com/blackboard/last-hour-rank.html#/
+            (
+                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20'
+                f'&area_id=0&page=',
+                5
+            ),
+            (
+                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20'
+                f'&area_id=1&page=',
+                5
+            ),
+            (
+                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20'
+                f'&area_id=2&page=',
+                5
+            ),
+            (
+                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20'
+                f'&area_id=3&page=',
+                5
+            ),
+            (
+                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20'
+                f'&area_id=4&page=',
+                5
+            ),
+            (
+                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20'
+                f'&area_id=5&page=',
+                5
+            ),
+            (
+                f'{base_url}/rankdb/v1/Rank2018/getTop?&type=master_last_hour&type_id=areaid_hour&page_size=20'
+                f'&area_id=6&page=',
+                5
+            ),
         ]
         self.urls = urls
 

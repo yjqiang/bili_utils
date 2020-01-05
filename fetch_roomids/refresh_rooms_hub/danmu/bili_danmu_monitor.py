@@ -39,7 +39,13 @@ class DanmuRaffleMonitor(WsDanmuClient):
         print(f'{self._area_id}号数据连接选择房间（{self._room_id}）')
 
     def handle_danmu(self, data: dict):
-        cmd = data['cmd']
+        if 'cmd' in data:
+            cmd = data['cmd']
+        elif 'msg' in data:
+            data = data['msg']
+            cmd = data['cmd']
+        else:
+            return True  # 预防未来sbb站
 
         if cmd == 'PREPARING':
             print(f'{self._area_id}号数据连接房间下播({self._room_id})')
@@ -54,21 +60,12 @@ class DanmuRaffleMonitor(WsDanmuClient):
             # 6 <%user_name%> 在直播间 <%529%> 使用了 <%20%> 倍节奏风暴，大家快去跟风领取奖励吧！(只报20的)
             msg_type = data['msg_type']
             real_roomid = int(data['real_roomid'])
-            msg_common = data['msg_common'].replace(' ', '')
-            msg_common = msg_common.replace('”', '')
-            msg_common = msg_common.replace('“', '')
             if msg_type == 2 or msg_type == 8:
-                str_gift = msg_common.split('%>')[-1].split('，')[0]
-                if '个' in str_gift:
-                    _, raffle_name = str_gift.split('个')
-                elif '了' in str_gift:
-                    raffle_name = str_gift.split('了')[-1]
-                else:
-                    raffle_name = str_gift
+                raffle_name = '小电视'
                 print(f'{self._area_id}号数据连接检测到{real_roomid:^9}的{raffle_name}')
                 self.add2rooms(real_roomid, 'TV')
             elif msg_type == 3:
-                raffle_name = msg_common.split('开通了')[-1][:2]
+                raffle_name = '舰队'
                 print(f'{self._area_id}号数据连接检测到{real_roomid:^9}的{raffle_name}')
                 self.add2rooms(real_roomid, 'GUARD')
             elif msg_type == 6:
